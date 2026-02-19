@@ -1,0 +1,38 @@
+# Large model weights
+/models/
+
+# Actor/judge inference output (large JSONs, regenerate with run scripts)
+/results/
+
+# Intermediate feature CSVs (regenerate with extract_features.py)
+/model_logits/
+
+# Conformal predictor checkpoints
+/model_paths/
+/R2CCP_paths/
+
+# Training logs
+/lightning_logs/
+/logs/
+
+# Python wheel (install from requirements.txt)
+*.whl
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Claude Code internal state
+.claude/
+
+# OS
+.DS_Store
+
+# Large data files (document where to download instead)
+*.bin
+*.safetensors
