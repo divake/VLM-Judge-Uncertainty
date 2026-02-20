@@ -1,10 +1,18 @@
+# Markdown files (internal docs, plans, research notes)
+*.md
+
 # Large model weights
 /models/
+/models
 
-# Actor/judge inference output (large JSONs, regenerate with run scripts)
+# Data (download separately, see configs/datasets/)
+/data/
+
+# Inference outputs (regenerate with scripts/)
 /results/
+/outputs/
 
-# Intermediate feature CSVs (regenerate with extract_features.py)
+# Intermediate feature CSVs
 /model_logits/
 
 # Conformal predictor checkpoints
@@ -15,7 +23,7 @@
 /lightning_logs/
 /logs/
 
-# Python wheel (install from requirements.txt)
+# Python wheel
 *.whl
 
 # Python cache
@@ -33,6 +41,8 @@ __pycache__/
 # OS
 .DS_Store
 
-# Large data files (document where to download instead)
+# Large binary files
 *.bin
 *.safetensors
+*.ckpt
+*.pt

@@ -1,0 +1,10 @@
+name: general_scoring
+# LLaVA-Critic pointwise scoring format (from model README).
+# Uses the exact prompt structure the model was fine-tuned on.
+# Scale is 1-5 to match MLLM-Judge GT labels.
+template: |
+  Given an image and a corresponding question, please serve as an unbiased and fair judge to evaluate the quality of the answer provided by a Large Multimodal Model (LMM). Score the response on a scale of 1 to 5 (where 1 is worst and 5 is best) and explain your reasoning with specific details. At the end of your response, you must provide your final score in exactly this format on its own line: "Score: X" where X is a single number from 1 to 5. Your task is provided as follows:
+  Question: [{question}]
+  The LMM response: [{actor_answer}]
+  ASSISTANT:
+score_tokens: ["1", "2", "3", "4", "5"]

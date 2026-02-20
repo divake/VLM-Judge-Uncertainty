@@ -1,0 +1,10 @@
+name: llava-critic-7b
+hf_id: lmms-lab/llava-critic-7b
+model_class: LlavaQwenForCausalLM
+processor_class: llava_next
+dtype: float16
+device_map: auto
+max_new_tokens: 1024
+do_sample: false
+top_k: 50
+role: judge

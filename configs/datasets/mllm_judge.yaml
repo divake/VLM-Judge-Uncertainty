@@ -1,0 +1,9 @@
+name: mllm_judge
+source: github.com/Dongping-Chen/MLLM-Judge
+data_dir: data/mllm_judge
+gt_scale: [1, 5]       # actual scale is 1-5 (NOT 1-10 as originally assumed)
+target_scale: [1, 5]
+scale_mapping: none     # no mapping needed — already on target scale
+subset_size: 200        # pilot run (full dataset: 5,719 samples)
+split: scoring          # use scoring subset
+# filter_model: llava   # optional: filter to specific model's answers

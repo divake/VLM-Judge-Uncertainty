@@ -1,0 +1,25 @@
+experiment_name: pilot_mllm_judge
+
+actor:
+  config: configs/models/llava_15_7b.yaml
+  gpu: "cuda:0"
+
+judge:
+  config: configs/models/llava_critic_7b.yaml
+  prompt: configs/prompts/general_scoring.yaml
+  gpu: "cuda:0"
+
+dataset:
+  config: configs/datasets/mllm_judge.yaml
+
+conformal:
+  method: R2CCP
+  alpha: 0.10
+  num_seeds: 100
+  test_size: 0.5
+
+save:
+  save_full_logits: true
+  save_top_k_logprobs: 50
+  save_attention: false
+  output_dir: outputs

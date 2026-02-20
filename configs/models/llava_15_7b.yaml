@@ -1,0 +1,10 @@
+name: llava-1.5-7b
+hf_id: llava-hf/llava-1.5-7b-hf
+model_class: LlavaForConditionalGeneration
+processor_class: AutoProcessor
+dtype: float16
+device_map: auto
+max_new_tokens: 512
+do_sample: false
+top_k: 50
+role: actor
