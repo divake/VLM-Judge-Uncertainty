@@ -7,4 +7,5 @@ device_map: auto
 max_new_tokens: 1024
 do_sample: false
 top_k: 50
+save_full_scores: false
 role: judge

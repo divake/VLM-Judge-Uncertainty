@@ -19,7 +19,7 @@ conformal:
   test_size: 0.5
 
 save:
-  save_full_logits: true
+  save_full_logits: false
   save_top_k_logprobs: 50
   save_attention: false
   output_dir: outputs

@@ -44,6 +44,7 @@ class LLaVAModel(BaseVLM):
         self.max_new_tokens = self.config.get("max_new_tokens", 512)
         self.do_sample = self.config.get("do_sample", False)
         self.top_k = self.config.get("top_k", 50)
+        self.save_full_scores = self.config.get("save_full_scores", True)
 
         self.model = None
         self.tokenizer = None
@@ -271,14 +272,15 @@ class LLaVAModel(BaseVLM):
             token_logprobs.append(lp)
             top_logprobs.append(topk_dict)
 
-            full_scores_list.append(step_scores[0].cpu())
+            if self.save_full_scores:
+                full_scores_list.append(step_scores[0].cpu())
 
         return GenerationOutput(
             generated_text=generated_text,
             tokens=tokens,
             token_logprobs=token_logprobs,
             top_logprobs=top_logprobs,
-            full_scores=full_scores_list,
+            full_scores=full_scores_list if self.save_full_scores else None,
         )
 
     def unload_model(self):
