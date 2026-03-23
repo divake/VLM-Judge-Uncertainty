@@ -1,0 +1,6 @@
+judge,n,exact_accuracy,within_1_accuracy,within_2_accuracy,mae
+CogVLM,3215,0.3303,0.7546,0.8989,1.0336
+GPT-4V,4272,0.4216,0.8261,0.9354,0.8294
+Gemini,3890,0.3545,0.7311,0.8769,1.0815
+LLaVA,4262,0.3099,0.7245,0.8724,1.11
+LLaVA-Critic-7B (our CoT),5716,0.3216,0.7505,0.9171,1.031

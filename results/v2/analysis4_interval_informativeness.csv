@@ -1,0 +1,4 @@
+category,n_samples,pct,avg_width,coverage
+Decisive (≤2),13,0.45,1.9231,0.8462
+Moderate (2-3),879,30.75,3.0,0.9545
+Uninformative (>3),1967,68.8,4.0,1.0

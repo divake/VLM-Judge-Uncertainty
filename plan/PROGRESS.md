@@ -211,6 +211,16 @@ CQR's base quantile regressor (GradientBoosting) produces intervals spanning nea
 - Judge has positive bias (+0.38) — overscores bad answers, underscores excellent ones
 - All judges in dataset show same ±1 pattern (72-83% within 1 point)
 
+**11. CP Value Analysis (error bins, "CP saved you", conditional coverage)**
+- CP recovers 97.8% of judge errors (1,885 out of 1,927 wrong predictions)
+- For ±1 errors: CP coverage = 99.9% after boundary adjustment
+- For ±2 errors: CP coverage = 99.4%
+- For ±3 errors: CP coverage = 91.5%
+- GT=1 is weakest (88.9% coverage) — judge overscores bad answers
+- ~31% of intervals are "moderate" (width 2-3), useful for decisions
+- CP coverage holds across all 14 dataset types (≥96% after adjustment)
+- Midpoint does NOT improve over raw judge score (unlike Sheng et al.)
+
 ### Key files:
 - `configs/prompts/mllm_judge_cot.yaml` — new CoT prompt
 - `scripts/run_judge_lean.py` — lean inference runner
@@ -226,6 +236,7 @@ CQR's base quantile regressor (GradientBoosting) produces intervals spanning nea
 - [x] Complete all 9 methods + boundary adjustment
 - [x] Complete per-dataset R2CCP analysis
 - [x] Error analysis (confusion matrix, relaxed accuracy, judge bias)
+- [x] CP value analysis (error bins, "CP saved you", conditional coverage, informativeness)
 - [ ] Decide novel contribution direction
 - [ ] Add more VLM judges (Qwen2.5-VL-7B, InternVL2-8B)
 - [ ] Midpoint analysis

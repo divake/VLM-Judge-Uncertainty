@@ -1,0 +1,2 @@
+raw_judge_pearson,raw_judge_spearman,raw_judge_mae,raw_judge_accuracy,midpoint_raw_pearson,midpoint_raw_spearman,midpoint_raw_mae,midpoint_adj_pearson,midpoint_adj_spearman,midpoint_adj_mae,midpoint_rounded_accuracy
+0.4119,0.3666,1.0217,0.326,0.3959,0.3585,0.9917,0.2773,0.2716,1.0556,0.2809
