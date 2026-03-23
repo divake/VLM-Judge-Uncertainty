@@ -86,11 +86,14 @@ def run_inference(model, processor, image_path, prompt, max_new_tokens=1024):
         {"role": "user", "content": f"<|image|>\n{prompt}"},
     ]
 
-    # Process inputs
+    # Process inputs — append <think> to force reasoning mode
+    text_input = processor.tokenizer.apply_chat_template(
+        messages, tokenize=False, add_generation_prompt=True
+    )
+    text_input = text_input + "<think>\n"
+
     inputs = processor(
-        text=processor.tokenizer.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True
-        ),
+        text=text_input,
         images=image,
         return_tensors="pt",
     ).to(model.device)
@@ -196,7 +199,7 @@ def main():
     parser.add_argument("--output", type=str, required=True)
     parser.add_argument("--start-idx", type=int, default=0)
     parser.add_argument("--end-idx", type=int, default=None)
-    parser.add_argument("--max-new-tokens", type=int, default=1024)
+    parser.add_argument("--max-new-tokens", type=int, default=2048)
     args = parser.parse_args()
 
     # Load dataset
