@@ -6,7 +6,7 @@ actor:
 
 judge:
   config: configs/models/llava_critic_7b.yaml
-  prompt: configs/prompts/general_scoring.yaml
+  prompt: configs/prompts/mllm_judge_cot.yaml
   gpu: "cuda:0"
 
 dataset:

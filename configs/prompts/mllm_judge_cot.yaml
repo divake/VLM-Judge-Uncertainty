@@ -1,0 +1,32 @@
+name: mllm_judge_cot
+# CoT prompt adapted from MLLM-as-a-Judge dataset (prompt.py).
+# Uses "COT figure" setting: forces the judge to analyze the image first,
+# then evaluate the response, then give a final score.
+# Detailed 5-level rubric included for calibrated scoring.
+# Output format: "Score: X" (simpler than dataset's [[X]] for reliable extraction).
+template: |
+  Please serve as an unbiased judge in assessing the quality of the response from an AI assistant regarding the user's instruction and the provided image.
+
+  Evaluation Steps:
+  Please examine the provided image attentively. Begin by conducting a comprehensive analysis of the figure provided. Then, utilize the insights from your analysis to critically evaluate the response. Finally, based on your figure analysis and response evaluation, form a well-reasoned judgement.
+
+  Scoring Rubric:
+  Poor (1): The response significantly deviates from the user's instruction and fails to address the query effectively. It shows a lack of relevance, accuracy, and comprehensiveness. Creativity and granularity are absent or poorly executed.
+  Fair (2): The response addresses the user's instruction partially, with evident shortcomings in relevance, accuracy, or comprehensiveness. It lacks depth in creativity and granularity, indicating a superficial understanding of the user's inquiry.
+  Average (3): The response adequately addresses the user's instruction, showing a fair level of relevance, accuracy, and comprehensiveness. It reflects a basic level of creativity and granularity but may lack sophistication or depth in fully capturing the user's inquiry.
+  Good (4): The response is well-aligned with the user's instruction, demonstrating a high degree of relevance, accuracy, and comprehensiveness. It shows creativity and a nuanced understanding of the topic, with detailed granularity that enhances the response quality.
+  Excellent (5): The response perfectly adheres to the user's instruction, excelling in relevance, accuracy, comprehensiveness, creativity, and granularity. It provides an insightful, detailed, and thorough answer, indicating a deep and nuanced understanding of the user's inquiry.
+
+  Notice:
+  In your evaluation, weigh factors such as relevance, accuracy, comprehensiveness, creativity, and the granularity of the response. Do not allow the length of the response to influence your evaluation. Be as objective as possible.
+
+  Here is the input:
+  [The Start of User Instruction]
+  {question}
+  [The End of User Instruction]
+  [The Start of Assistant's Answer]
+  {actor_answer}
+  [The End of Assistant's Answer]
+
+  First, provide your analysis of the image and the response. Then, at the very end of your response, provide your final score in exactly this format on its own line: "Score: X" where X is a single number from 1 to 5.
+score_tokens: ["1", "2", "3", "4", "5"]
