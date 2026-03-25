@@ -284,8 +284,10 @@ CQR's base quantile regressor (GradientBoosting) produces intervals spanning nea
 - [x] Error analysis (confusion matrix, relaxed accuracy, judge bias)
 - [x] CP value analysis (error bins, conditional coverage, informativeness)
 - [x] Paper abstract drafted
-- [ ] Phi-4 full run completion + analysis
-- [ ] Gemini full run completion + analysis
-- [ ] Cross-judge comparison (3 judges × 14 datasets × 8 CP methods)
+- [x] Phi-4 full run completion + analysis (DONE)
+- [x] Gemini full run completion + analysis (DONE)
+- [x] Polaris dataset downloaded (8,726 captioning samples, running on LLaVA-Critic)
+- [ ] Polaris analysis completion
+- [ ] Cross-judge comparison paper table
 - [ ] Decide novel contribution direction
-- [ ] Paper writing (10 days to deadline)
+- [ ] Paper writing (~8 days to deadline)

@@ -1,0 +1,3 @@
+judge,n_samples,pearson,spearman,kendall,accuracy,within_1_accuracy,mae,bias,max_softmax_mean,overconfident_99,overconfident_999
+LLaVA-Critic-7B,5716,0.402,0.3558,0.3003,0.3216,0.7505,1.031,0.3798,0.8753,0.2563,0.0663
+Gemini-2.5-Flash,5409,0.4586,0.4458,0.3766,0.3213,0.7025,1.1224,-0.0453,0.9401,0.8303,0.774
