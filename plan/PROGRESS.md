@@ -232,12 +232,60 @@ CQR's base quantile regressor (GradientBoosting) produces intervals spanning nea
 
 ---
 
+---
+
+## 3.1
+**Date:** 2026-03-25
+**Adding more VLM judges: Phi-4 + Gemini**
+
+### What was done:
+
+**1. Phi-4-reasoning-vision-15B (Microsoft, 15B params)**
+- Downloaded model (~29GB) to `models/Phi-4-reasoning-vision-15B/`
+- Created separate conda env `phi4_env` (needs transformers>=4.57.1, incompatible with LLaVA)
+- Script: `scripts/run_judge_phi4.py`
+- Key: Must append `<think>` to force reasoning mode (otherwise outputs 6-token non-reasoning responses)
+- Uses `dtype=torch.float16`, `attn_implementation="sdpa"`, `device_map="auto"`
+- GPU memory: 28.2GB per model — fits one per 48GB GPU
+- Speed: ~25s per sample with reasoning (~300-1100 tokens generated)
+- Preliminary results (3,149 samples): Pearson=0.243, Accuracy=34.6%, ±1=76.8%, MAE=0.979
+- Less biased than LLaVA-Critic (+0.13 vs +0.38) but more overconfident (45.3% vs 25.6% >0.99)
+- Status: RUNNING on 2 GPUs (~8-9 hours remaining)
+
+**2. Gemini 2.5 Flash (Google, closed-source, Vertex AI)**
+- Set up Vertex AI authentication: `gcloud auth application-default login`
+- Project: `gen-lang-client-0896152357`, Location: `us-central1`
+- Uses LiteLLM wrapper: `model="vertex_ai/gemini-2.5-flash"`
+- Logprobs via Vertex AI: `logprobs=True, top_logprobs=20` (NOT available on Google AI Studio!)
+- Script: `scripts/run_judge_gemini.py` — saves both S2 CSV and full responses CSV
+- Speed: ~8-10s per sample, ~$2-3 for full dataset
+- Preliminary results (10 samples): Accuracy=30%, very overconfident (90% samples >0.99)
+- Status: RUNNING 4 parallel API processes (~5-6 hours remaining)
+- Cost estimate: ~$2-3 total
+
+**3. Paper abstract drafted**
+- File: `paper/abstract_draft.md`
+- Title: "How Reliable Are VLM Judges? Conformal Prediction Reveals Task-Dependent Uncertainty in Multimodal Evaluation"
+- Multiple options (A-F), Option F selected for funding agency submission
+- Key contribution framing: task-dependent uncertainty + ranking-scoring decoupling
+
+**4. Gemini API learnings**
+- Google AI Studio (`generativelanguage.googleapis.com`) does NOT support logprobs on 2.5 models
+- Vertex AI (`aiplatform.googleapis.com`) DOES support logprobs via LiteLLM
+- gemini-2.0-flash deprecated ("no longer available to new users")
+- Need `gcloud auth application-default login` + quota project set
+- Reference: TRACER paper (arxiv:2602.11409) from same lab uses same LiteLLM + Vertex AI approach
+
+---
+
 ## Next Steps
-- [x] Complete all 9 methods + boundary adjustment
-- [x] Complete per-dataset R2CCP analysis
+- [x] Complete all 9 CP methods + boundary adjustment (LLaVA-Critic)
+- [x] Per-dataset R2CCP analysis (14 categories)
 - [x] Error analysis (confusion matrix, relaxed accuracy, judge bias)
-- [x] CP value analysis (error bins, "CP saved you", conditional coverage, informativeness)
+- [x] CP value analysis (error bins, conditional coverage, informativeness)
+- [x] Paper abstract drafted
+- [ ] Phi-4 full run completion + analysis
+- [ ] Gemini full run completion + analysis
+- [ ] Cross-judge comparison (3 judges × 14 datasets × 8 CP methods)
 - [ ] Decide novel contribution direction
-- [ ] Add more VLM judges (Qwen2.5-VL-7B, InternVL2-8B)
-- [ ] Midpoint analysis
-- [ ] Paper writing
+- [ ] Paper writing (10 days to deadline)

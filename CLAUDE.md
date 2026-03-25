@@ -4,16 +4,20 @@ This file provides guidance to Claude Code when working in this repository.
 
 ## Project Overview
 
-Research implementation for **"Uncertainty-Aware VLM-as-a-Judge: Interval Evaluations via 3-Signal Conformal Prediction"**.
+Research implementation for **"How Reliable Are VLM Judges? Conformal Prediction Reveals Task-Dependent Uncertainty in Multimodal Evaluation"**.
 
-**Target venue:** CoLM (Conference on Language Modeling)
+**Target venue:** CoLM 2026 (Conference on Language Modeling)
 
-**Core idea:** Extend conformal prediction-based uncertainty quantification from text-only LLM judges (the sibling LLM repo) to Vision-Language Model (VLM) judges, using a novel 3-signal MLP that fuses:
-1. **Signal 1** — Actor VLM's internal generation confidence (logprob entropy over visual tokens)
-2. **Signal 2** — Judge VLM's confidence about the actor (score-token log-probabilities)
-3. **Signal 3** — Judge VLM's self-uncertainty (entropy/margin of score distribution)
+**Core idea:** Apply conformal prediction to VLM-as-a-Judge, producing prediction intervals from judge score-token logits with provable coverage guarantees. Key findings: uncertainty is strongly task-dependent (40-70% of score range across 14 visual task types), and conformal prediction exposes a ranking-scoring decoupling invisible to standard metrics.
 
-See `RESEARCH_INFO.md` for complete research context, paper references, datasets, models, and the full plan.
+**Features used:** Signal 2 (S2) — Judge VLM's score-token log-probabilities for "1" through "5" at the score position. S1/S3 were abandoned (no improvement).
+
+**VLM Judges tested:**
+1. LLaVA-Critic-7B (open-source, 7B params) — best calibrated distributions
+2. Phi-4-reasoning-vision-15B (open-source, 15B params, Microsoft) — reasoning model
+3. Gemini 2.5 Flash (closed-source, Google Vertex AI) — API-based with logprobs
+
+See `results/v2/RESULTS_v3.0.md` for complete results and `paper/abstract_draft.md` for paper abstract.
 
 ---
 
@@ -161,21 +165,25 @@ generation = model.generate(
 
 ## Environment Setup
 
-**Conda Environment:** `env_py311` (same as LLM repo — shared environment)
+**Conda Environments:**
 
+1. `env_py311` — Main environment for LLaVA-Critic, conformal prediction, analysis
+   - transformers==4.47.0, torch==2.5.1, mapie==0.8.6
+   - R2CCP installed from wheel: `pip install R2CCP-0.0.8-py3-none-any.whl --no-deps`
+   - LiteLLM for Gemini API: `pip install litellm`
+   - MAPIE must be 0.8.6 (NOT v1.x)
+
+2. `phi4_env` — Separate environment for Phi-4 (needs transformers>=4.57.1)
+   - transformers==4.57.1, torch==2.5.1
+   - Required because Phi-4 uses Siglip2VisionModel not in transformers 4.47
+
+**Gemini API Setup (Vertex AI):**
 ```bash
-conda activate env_py311
-pip install R2CCP-0.0.8-py3-none-any.whl --no-deps
-pip install qwen_vl_utils pillow  # additional VLM dependencies
+gcloud auth application-default login
+gcloud auth application-default set-quota-project gen-lang-client-0896152357
+export VERTEXAI_PROJECT="gen-lang-client-0896152357"
+export VERTEXAI_LOCATION="us-central1"
 ```
-
-**Test R2CCP:**
-```bash
-python -c "from R2CCP.main import R2CCP; print('R2CCP OK')"
-```
-
-**MAPIE version is critical:** Must use `mapie==0.8.6` (NOT v1.x).
-`MapieQuantileRegressor` was renamed to `ConformalizedQuantileRegressor` in v1.x.
 
 ---
 
