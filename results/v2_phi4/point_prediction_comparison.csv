@@ -1,0 +1,3 @@
+judge,n_samples,pearson,spearman,kendall,accuracy,within_1_accuracy,mae,bias,max_softmax_mean,overconfident_99,overconfident_999
+LLaVA-Critic-7B,5716,0.402,0.3558,0.3003,0.3216,0.7505,1.031,0.3798,0.8753,0.2563,0.0663
+Phi-4-reasoning-15B,5653,0.303,0.2929,0.2506,0.3419,0.761,1.005,0.084,0.9064,0.4296,0.169
