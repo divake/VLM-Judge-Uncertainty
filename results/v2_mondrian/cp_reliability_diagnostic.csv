@@ -1,0 +1,43 @@
+dataset,judge,pearson,width_raw,cp_informativeness,ranking_scoring_gap
+AesBench,LLaVA-Critic,0.4023,2.0824,0.4794,-0.0771
+ChartQA,LLaVA-Critic,0.5065,3.0794,0.2301,0.2763
+Concept Caption,LLaVA-Critic,0.3621,2.7031,0.3242,0.0379
+ScienceQA,LLaVA-Critic,0.2578,3.2693,0.1827,0.0751
+VisitBench,LLaVA-Critic,0.3516,2.9592,0.2602,0.0914
+WIT,LLaVA-Critic,0.1636,2.3768,0.4058,-0.2422
+coco,LLaVA-Critic,0.3615,2.4273,0.3932,-0.0317
+diffusiondb,LLaVA-Critic,0.0889,3.4143,0.1464,-0.0575
+infographicsVQA,LLaVA-Critic,0.4108,3.5043,0.1239,0.2869
+llava_bench,LLaVA-Critic,0.2443,2.9201,0.27,-0.0257
+mathvista,LLaVA-Critic,0.3764,3.3687,0.1578,0.2186
+mind2web,LLaVA-Critic,0.2678,2.6903,0.3274,-0.0596
+mm-vet,LLaVA-Critic,0.2601,2.1798,0.455,-0.1949
+textVQA,LLaVA-Critic,0.3893,2.8123,0.2969,0.0924
+AesBench,Phi-4,0.3533,1.9752,0.5062,-0.1529
+ChartQA,Phi-4,0.2611,3.5208,0.1198,0.1413
+Concept Caption,Phi-4,0.2731,2.6975,0.3256,-0.0525
+ScienceQA,Phi-4,0.3035,3.2451,0.1887,0.1148
+VisitBench,Phi-4,0.3387,2.9001,0.275,0.0637
+WIT,Phi-4,0.3998,2.4842,0.379,0.0208
+coco,Phi-4,0.2742,2.5119,0.372,-0.0978
+diffusiondb,Phi-4,0.2846,3.2147,0.1963,0.0883
+infographicsVQA,Phi-4,0.162,3.5841,0.104,0.058
+llava_bench,Phi-4,0.1384,3.0676,0.2331,-0.0947
+mathvista,Phi-4,0.3392,3.4172,0.1457,0.1935
+mind2web,Phi-4,0.2244,2.7438,0.3141,-0.0897
+mm-vet,Phi-4,0.2961,2.3849,0.4038,-0.1077
+textVQA,Phi-4,0.2134,3.0997,0.2251,-0.0117
+AesBench,Gemini,0.2562,2.1431,0.4642,-0.208
+ChartQA,Gemini,0.4938,2.8285,0.2929,0.2009
+Concept Caption,Gemini,0.4275,2.7963,0.3009,0.1266
+ScienceQA,Gemini,0.5296,2.772,0.307,0.2226
+VisitBench,Gemini,0.5243,2.8446,0.2889,0.2354
+WIT,Gemini,0.294,2.3898,0.4025,-0.1085
+coco,Gemini,0.3421,2.3999,0.4,-0.0579
+diffusiondb,Gemini,0.3196,3.3759,0.156,0.1636
+infographicsVQA,Gemini,0.547,2.9344,0.2664,0.2806
+llava_bench,Gemini,0.3124,2.9132,0.2717,0.0407
+mathvista,Gemini,0.4143,3.3887,0.1528,0.2615
+mind2web,Gemini,0.0649,2.9204,0.2699,-0.205
+mm-vet,Gemini,0.2334,2.2903,0.4274,-0.194
+textVQA,Gemini,0.6003,2.3291,0.4177,0.1826
