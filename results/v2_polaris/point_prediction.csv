@@ -1,0 +1,2 @@
+dataset,judge,n_samples,pearson,spearman,kendall,accuracy,within_1_accuracy,mae,bias,max_softmax_mean,overconfident_99
+Polaris,LLaVA-Critic-7B,8724,0.9057,0.9247,0.8643,0.8085,0.9543,0.2425,-0.0621,0.9359,0.6638

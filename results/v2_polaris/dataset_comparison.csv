@@ -1,0 +1,3 @@
+dataset,n,pearson,accuracy,within_1,r2ccp_width_raw,r2ccp_cov_raw
+MLLM-Judge,5716,0.402,0.3216,0.7505,3.049,0.9
+Polaris,8724,0.9057,0.8085,0.9543,0.6779,0.8989
