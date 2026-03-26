@@ -1,90 +1,89 @@
 # Current Project Status
 
-**Last updated:** 2026-03-25
-**Version:** 3.1
+**Last updated:** 2026-03-27
+**Version:** 4.0
 **Target venue:** CoLM 2026 (Conference on Language Modeling)
 **Paper title:** "How Reliable Are VLM Judges? Conformal Prediction Reveals Task-Dependent Uncertainty in Multimodal Evaluation"
-**Timeline:** ~10 days to submission
+**Timeline:** ~7 days to submission
 
 ---
 
 ## One-Line Summary
 
-First systematic study of conformal prediction for VLM-as-a-Judge across 3 judges (LLaVA-Critic-7B, Phi-4-15B, Gemini 2.5 Flash), 8 CP methods, 14 visual task categories, 5,717 samples. Key finding: uncertainty is strongly task-dependent and CP exposes a ranking-scoring decoupling invisible to standard metrics.
+First systematic study of conformal prediction for VLM-as-a-Judge: 3 judges × 2 datasets × 8 CP methods + 3 novelty contributions (Mondrian CP, CP-Reliability Diagnostic, Multi-Judge CP analysis). Task-dependent uncertainty varies 40-70% across 14 visual task types.
 
 ---
 
-## VLM Judges
+## What's Complete
 
-| Judge | Type | Size | Status | Env | Key Feature |
-|-------|------|------|--------|-----|-------------|
-| LLaVA-Critic-7B | Open-source | 7B | COMPLETE | env_py311 | Best calibrated logprob distributions |
-| Phi-4-reasoning-vision-15B | Open-source | 15B | RUNNING (GPUs) | phi4_env | Reasoning model with `<think>` mode |
-| Gemini 2.5 Flash | Closed-source | Unknown | RUNNING (API) | env_py311 + Vertex AI | First closed-source VLM with logprobs |
+### Models (3 VLM Judges)
+| Judge | Type | Size | Env | Dataset |
+|-------|------|------|-----|---------|
+| LLaVA-Critic-7B | Open-source | 7B | env_py311 | MLLM-Judge + Polaris |
+| Phi-4-reasoning-vision-15B | Open-source | 15B | phi4_env | MLLM-Judge + Polaris |
+| Gemini 2.5 Flash | Closed-source | Unknown | env_py311 + Vertex AI | MLLM-Judge |
 
-## What Works (v3.0 — LLaVA-Critic complete)
+### Datasets (2)
+| Dataset | Samples | GT | Task | Judges Run |
+|---------|---------|-----|------|-----------|
+| MLLM-as-a-Judge | 5,717 | 1-5 (1 annotator) | VQA (14 types) | All 3 |
+| Polaris | 8,726 | 0-1 (3+ annotators) | Captioning | LLaVA + Phi-4 |
 
-- CoT prompt (adapted from MLLM-Judge dataset) on all 3 judges
-- All 8 conformal methods + boundary adjustment (R2CCP best: 0.900 coverage, 3.049 width)
-- Per-dataset R2CCP analysis (14 categories: aesthetics→2.08 width, infographics→3.50 width)
-- Error analysis: 75.1% within ±1, 3-class accuracy 58%, judge bias +0.38
-- CP value analysis: recovers 97.8% of judge errors, coverage holds across all 14 datasets
-- Per-dataset Naive CP baseline (R2CCP beats on all 14 datasets)
-- Confusion matrix, all-judges comparison, relaxed accuracy per dataset
+### Analyses Complete
+- [x] All 8 CP methods + boundary adjustment (LLaVA-Critic on MLLM-Judge)
+- [x] Per-dataset R2CCP (14 categories × 3 judges)
+- [x] Error analysis (confusion matrix, relaxed accuracy, judge bias, all judges comparison)
+- [x] CP value analysis (error bins, "CP saved you", conditional coverage, informativeness)
+- [x] Cross-judge comparison (3 judges on MLLM-Judge)
+- [x] Polaris analysis (LLaVA-Critic: 4.5x narrower intervals)
+- [x] Phi-4 on Polaris (complete)
+- [x] CLIPScore pilot (negative result)
 
-## What Doesn't Work / Was Abandoned
+### Novelty Contributions (3)
+- [x] **Mondrian CP** — Task-conditional CP: easy tasks 16.6% narrower intervals
+- [x] **CP-Reliability Diagnostic** — Ranking-Scoring Gap metric for practitioner guidance
+- [x] **Multi-Judge CP** — Negative result: single best judge > feature fusion
 
-- S1/S3 signals (no improvement over S2 alone)
-- 3-signal MLP fusion (dead end)
-- CQR/AsymCQR/OrdinalAPS (over-cover to ~100% with near-full-range intervals)
-- CLIPScore as visual grounding signal (Pearson=-0.017 with judge error)
-- Old generic prompt (51.4% overconfident vs 25.6% with CoT)
-- Gemini via Google AI Studio (logprobs not supported — must use Vertex AI)
-
-## What's In Progress
-
-- [ ] Phi-4-reasoning-vision-15B full run (running on 2 GPUs, ~8-9 hours remaining)
-- [ ] Gemini 2.5 Flash full run (running on Vertex AI, 4 parallel, ~5-6 hours remaining)
-- [ ] Novel contribution direction (discussing with professor)
-
-## What's Not Done Yet
-
-- [ ] Analysis on Phi-4 and Gemini results (run all CP methods, error analysis, per-dataset)
-- [ ] Cross-judge comparison table
-- [ ] Novel method contribution (multi-judge disagreement? adaptive α? re-prompting?)
-- [ ] Midpoint analysis
-- [ ] Paper writing
+### Paper
+- [x] Abstract drafted (Option F selected)
+- [ ] Paper writing in progress (separate Claude agent)
 
 ---
 
-## Key Files
+## Key Results (Raw Coverage = α=0.10 target)
 
-### Scripts
-| Purpose | File | Env |
-|---------|------|-----|
-| LLaVA-Critic inference | `scripts/run_judge_lean.py` | env_py311 |
-| Phi-4 inference | `scripts/run_judge_phi4.py` | phi4_env |
-| Gemini inference | `scripts/run_judge_gemini.py` | env_py311 + Vertex AI |
-| All 9 CP methods | `scripts/run_all_conformal.py` | env_py311 |
-| Per-dataset R2CCP | `scripts/run_r2ccp_per_dataset.py` | env_py311 |
-| CLIPScore pilot | `scripts/clip_pilot.py` | env_py311 |
-| Test runner | `scripts/test_lean_runner.py` | env_py311 |
+### R2CCP on MLLM-Judge (raw / adjusted)
+| Judge | Coverage (raw) | Width (raw) | Coverage (adj) | Width (adj) |
+|-------|:-:|:-:|:-:|:-:|
+| Gemini 2.5 Flash | 0.898 | **2.853** | 0.980 | **3.413** |
+| LLaVA-Critic-7B | **0.900** | 3.049 | 0.981 | 3.600 |
+| Phi-4-15B | 0.891 | 3.133 | 0.981 | 3.702 |
 
-### Results
-| Purpose | File |
-|---------|------|
-| LLaVA-Critic features | `results/v2/features_s2.csv` |
-| Phi-4 features | `results/v2_phi4/features_s2.csv` (in progress) |
-| Gemini features | `results/v2_gemini/features_s2.csv` (in progress) |
-| All CP methods | `results/v2/all_methods_results.csv` |
-| Per-dataset R2CCP | `results/v2/r2ccp_per_dataset.csv` |
-| Error analysis | `results/v2/error_analysis*.csv` |
-| Complete results doc | `results/v2/RESULTS_v3.0.md` |
-| Paper abstract | `paper/abstract_draft.md` |
+### R2CCP on Polaris (LLaVA-Critic)
+| Dataset | Coverage (raw) | Width (raw) |
+|---------|:-:|:-:|
+| MLLM-Judge | 0.900 | 3.049 |
+| **Polaris** | **0.899** | **0.678** (4.5x narrower) |
 
-### Configs
-| Purpose | File |
-|---------|------|
-| CoT prompt | `configs/prompts/mllm_judge_cot.yaml` |
-| Experiment config | `configs/experiments/pilot_mllm_judge.yaml` |
-| LLaVA-Critic model | `configs/models/llava_critic_7b.yaml` |
+---
+
+## All Result Files
+
+### MLLM-Judge (LLaVA-Critic)
+`results/v2/` — features_s2.csv, RESULTS_v3.0.md, all_methods_results.csv, r2ccp_per_dataset.csv, confusion_matrix.csv, error_analysis*.csv, analysis1-6*.csv, all_judges_comparison.csv, naive_cp_per_dataset.csv
+
+### MLLM-Judge (Phi-4)
+`results/v2_phi4/` — features_s2.csv, RESULTS_phi4.md, point_prediction_comparison.csv, r2ccp_per_dataset.csv, confusion_matrix.csv, error_analysis_per_dataset.csv, error_bins_cp_coverage.csv, cp_methods_results.csv
+
+### MLLM-Judge (Gemini)
+`results/v2_gemini/` — features_s2.csv, features_s2_responses.csv, RESULTS_gemini.md, point_prediction_comparison.csv, r2ccp_per_dataset.csv, confusion_matrix.csv, error_analysis_per_dataset.csv, error_bins_cp_coverage.csv, cp_methods_results.csv
+
+### Polaris (LLaVA-Critic)
+`results/v2_polaris/` — features_s2.csv, RESULTS_polaris.md, point_prediction.csv, confusion_matrix.csv, r2ccp_results.csv, error_bins_cp_coverage.csv, dataset_comparison.csv
+
+### Polaris (Phi-4)
+`results/v2_polaris_phi4/` — features_s2.csv (analysis pending)
+
+### Novelty Contributions
+`results/v2_mondrian/` — mondrian_comparison.csv, cp_reliability_diagnostic.csv
+`results/v2_multijudge/` — multijudge_comparison.csv
