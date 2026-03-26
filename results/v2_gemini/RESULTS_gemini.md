@@ -173,5 +173,5 @@ Gemini shows the **clearest ranking-scoring decoupling** — high Pearson doesn'
 | `error_analysis_per_dataset.csv` | ±1 accuracy and MAE per dataset |
 | `r2ccp_per_dataset.csv` | R2CCP width per 14 datasets |
 | `error_bins_cp_coverage.csv` | CP coverage per error bin |
-| `cp_methods_results.csv` | Key CP methods (pending CHR/BoostedLCP) |
+| `cp_methods_results.csv` | All CP methods: CQR, R2CCP, CHR, Boosted LCP |
 | `RESULTS_gemini.md` | This document |
