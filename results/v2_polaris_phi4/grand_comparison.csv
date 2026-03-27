@@ -1,0 +1,6 @@
+judge,dataset,pearson,accuracy,within_1,r2ccp_width_raw,r2ccp_coverage_raw
+LLaVA-Critic,MLLM-Judge,0.402,0.322,0.751,3.049,0.9
+Phi-4-15B,MLLM-Judge,0.303,0.342,0.761,3.133,0.891
+Gemini Flash,MLLM-Judge,0.459,0.321,0.703,2.853,0.898
+LLaVA-Critic,Polaris,0.906,0.808,0.954,0.678,0.899
+Phi-4-15B,Polaris,0.036,0.2,0.375,2.964,0.92
