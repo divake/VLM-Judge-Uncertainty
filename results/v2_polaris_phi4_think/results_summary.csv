@@ -1,0 +1,2 @@
+judge,dataset,n,pearson,accuracy,within_1,mae,bias,r2ccp_cov_raw,r2ccp_width_raw,r2ccp_cov_adj,r2ccp_width_adj,overconfident_99
+Phi-4-think,Polaris-balanced-924,924,0.1275,0.2615,0.605,1.3964,0.6815,0.8924,3.6019,0.9732,3.8355,0.2987
