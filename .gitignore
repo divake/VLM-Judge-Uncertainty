@@ -1,5 +1,7 @@
-# Markdown files (internal docs, plans, research notes)
+# Internal markdown files (plans, research notes, agent transcripts)
+# README.md is allowlisted below so it is published.
 *.md
+!README.md
 
 # Large model weights
 /models/
@@ -8,9 +10,41 @@
 # Data (download separately, see configs/datasets/)
 /data/
 
-# Inference outputs (regenerate with scripts/)
-/results/
+# Raw inference outputs — large per-sample JSONs (regenerate with scripts/).
+# Aggregate CSVs already tracked under results/ remain in the repo so reviewers
+# can verify reported numbers without re-running inference.
 /outputs/
+
+# Local LaTeX build artifacts
+*.aux
+*.log
+*.bbl
+*.blg
+*.out
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# Per-chunk and per-sample intermediate result CSVs (regenerate from inference)
+results/**/features_s2_p*.csv
+results/**/*_responses.csv
+results/**/test_*.csv
+
+# Early-experiment full_dataset directory (large, superseded by results/v2*)
+/results/full_dataset/
+
+# texput.log accumulated from LaTeX runs at root
+/texput.log
+
+# Reference papers / PDFs at root
+/Analyzing_Uncertainty_of_LLM-as-a-Judge_*.pdf
+
+# CoLM template directory (only the colm2026 paper dir is published)
+paper/colm2026_template/
+
+# Embedded git backup from the CoLM template clone
+paper/colm2026/.git.bak/
 
 # Intermediate feature CSVs
 /model_logits/
