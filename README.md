@@ -1,6 +1,6 @@
 # VLM-Judge-Uncertainty
 
-> **How Reliable Are VLM Judges? Conformal Prediction Reveals Task-Dependent Uncertainty in Multimodal Evaluation.**
+> **VLM Judges Can Rank but Cannot Score: Task-Dependent Uncertainty in Multimodal Evaluation.**
 > A distribution-free framework that turns Vision-Language-Model (VLM) judge scores into calibrated prediction intervals with provable coverage guarantees, using only score-token log-probabilities and no retraining.
 
 <p align="center">
@@ -30,7 +30,7 @@ The intervals are valid (≥90% coverage), informative (interval width is a usab
 
 The arXiv-ready preprint lives at [`paper/colm2026/main_arxiv.tex`](paper/colm2026/main_arxiv.tex) (PDF: [`main_arxiv.pdf`](paper/colm2026/main_arxiv.pdf)).
 
-**Authors:** Divake Kumar¹ · Sina Tayebati¹ · Devashri Naik¹ · Ranganath Krishnan² · Amit Ranjan Trivedi¹
+**Authors:** Divake Kumar¹, Sina Tayebati¹, Devashri Naik¹, Ranganath Krishnan², Amit Ranjan Trivedi¹
 ¹ University of Illinois at Chicago &nbsp;&nbsp; ² AI Labs, Capital One
 
 ---
@@ -377,8 +377,8 @@ If you use this code or build on this work, please cite:
 
 ```bibtex
 @article{kumar2026vlmjudgeuncertainty,
-  title  = {How Reliable Are VLM Judges? Conformal Prediction Reveals
-            Task-Dependent Uncertainty in Multimodal Evaluation},
+  title  = {VLM Judges Can Rank but Cannot Score: Task-Dependent
+            Uncertainty in Multimodal Evaluation},
   author = {Kumar, Divake and Tayebati, Sina and Naik, Devashri and
             Krishnan, Ranganath and Trivedi, Amit Ranjan},
   year   = {2026},
