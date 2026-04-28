@@ -40,8 +40,7 @@
 \title{VLM Judges Can Rank but Cannot Score: Task-Dependent Uncertainty in Multimodal Evaluation}
 
 \author{Divake Kumar$^{1}$, Sina Tayebati$^{1}$, Devashri Naik$^{1}$, Ranganath Krishnan$^{2}$, Amit Ranjan Trivedi$^{1}$ \\[4pt]
-$^{1}$University of Illinois at Chicago, $^{2}$AI Labs, Capital One \\[4pt]
-\texttt{\href{https://github.com/divake/VLM-Judge-Uncertainty}{github.com/divake/VLM-Judge-Uncertainty}}
+$^{1}$University of Illinois at Chicago, $^{2}$AI Labs at Capital One
 }
 
 \begin{document}
@@ -56,7 +55,8 @@ $^{1}$University of Illinois at Chicago, $^{2}$AI Labs, Capital One \\[4pt]
 Vision-language models (VLMs) are increasingly used as automated judges for multimodal systems, yet their scores provide no indication of reliability. We study this problem through conformal prediction, a distribution-free framework that converts a judge's point score into a calibrated prediction interval using only score-token log-probabilities, with no retraining. 
 We present the first systematic analysis of conformal prediction for VLM-as-a-Judge across 3 judges and 14 visual task categories. Our results show that evaluation uncertainty is strongly task-dependent: intervals cover $\sim 40\%$ of the score range for aesthetics and natural images but expand to $\sim 70\%$ for chart and mathematical reasoning, yielding a quantitative reliability map for multimodal evaluation. 
 We further identify a failure mode not captured by standard evaluation metrics, \emph{ranking-scoring decoupling}, where judges achieve high ranking correlation while producing wide, uninformative intervals, correctly ordering responses but failing to assign reliable absolute scores. 
-Finally, we show that interval width is driven primarily by task difficulty and annotation quality, i.e., the same judge and method yield $4.5\times$ narrower intervals on a clean, multi-annotator captioning benchmark. 
+Finally, we show that interval width is driven primarily by task difficulty and annotation quality, i.e., the same judge and method yield $4.5\times$ narrower intervals on a clean, multi-annotator captioning benchmark. \\[4pt]
+\textbf{Code:} \href{https://github.com/divake/VLM-Judge-Uncertainty}{\texttt{github.com/divake/VLM-Judge-Uncertainty}}
 \end{abstract}
 
 \section{Introduction}
@@ -287,6 +287,15 @@ Infograph. & 398 & \textbf{3.50} & \textbf{3.84} & .411 & 69.3\% & Vision \\
 \subsection{Error structure and bias}
 \label{sec:error_bias}
 
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\linewidth]{figures/task_width_comparison.pdf}
+\caption{R2CCP interval width across 14 task categories for all three judges. Task-dependent uncertainty is consistent: aesthetics tasks yield tight intervals while vision-heavy tasks produce wide intervals regardless of the judge. The ordering is largely preserved across judges (Spearman $\rho = 0.82$--$0.93$).\vspace{-15pt}}
+\label{fig:task_width}
+\end{figure}
+
+
 Table~\ref{tab:bias2} shows that VLM judges exhibit structured and systematic errors. Low-quality responses (GT=1) are consistently overscored, often assigned scores near 3, while high-quality responses are underscored, leading to compression toward the middle of the scale. This pattern is consistent across all three judges. These structured errors explain the observed uncertainty behavior. Large and inconsistent deviations increase nonconformity scores, leading to wider intervals, particularly for vision-heavy tasks. In contrast, tasks with more consistent predictions, even if biased, produce narrower intervals. This shows that interval width reflects not only accuracy but the distribution and magnitude of errors.
 
 \begin{table}[t]
@@ -355,12 +364,6 @@ Vision-Heavy & 2,383 & 3.21 & .388 & 71.3\% \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.8\linewidth]{figures/task_width_comparison.pdf}
-\caption{R2CCP interval width across 14 task categories for all three judges. Task-dependent uncertainty is consistent: aesthetics tasks yield tight intervals while vision-heavy tasks produce wide intervals regardless of the judge. The ordering is largely preserved across judges (Spearman $\rho = 0.82$--$0.93$).\vspace{-15pt}}
-\label{fig:task_width}
-\end{figure}
 
 \subsection{Ranking-scoring decoupling}
 \label{sec:decoupling}
