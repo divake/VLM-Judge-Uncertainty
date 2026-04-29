@@ -26,6 +26,9 @@
 *.fdb_latexmk
 *.fls
 
+# Built paper PDF — readers should go to arXiv
+paper/colm2026/main_arxiv.pdf
+
 # Per-chunk and per-sample intermediate result CSVs (regenerate from inference)
 results/**/features_s2_p*.csv
 results/**/*_responses.csv

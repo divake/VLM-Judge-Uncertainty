@@ -28,10 +28,10 @@ The intervals are valid (≥90% coverage), informative (interval width is a usab
 
 ## Paper
 
-The arXiv-ready preprint lives at [`paper/colm2026/main_arxiv.tex`](paper/colm2026/main_arxiv.tex) (PDF: [`main_arxiv.pdf`](paper/colm2026/main_arxiv.pdf)).
+📄 **Read the paper on arXiv:** [arxiv.org/abs/2604.25235](https://arxiv.org/abs/2604.25235)
 
 **Authors:** Divake Kumar¹, Sina Tayebati¹, Devashri Naik¹, Ranganath Krishnan², Amit Ranjan Trivedi¹
-¹ University of Illinois at Chicago &nbsp;&nbsp; ² AI Labs, Capital One
+¹ University of Illinois at Chicago &nbsp;&nbsp; ² AI Labs at Capital One
 
 ---
 
@@ -355,8 +355,7 @@ VLM-Judge-Uncertainty/
 │
 ├── paper/                          ← paper sources (LaTeX)
 │   └── colm2026/
-│       ├── main_arxiv.tex            · arXiv version (this README's source)
-│       ├── main_arxiv.pdf            · built PDF
+│       ├── main_arxiv.tex            · arXiv version source
 │       ├── references_write_01.bib   · bibliography
 │       └── figures/
 │
@@ -376,12 +375,14 @@ The code in this repository is released under the **MIT License** (see `LICENSE`
 If you use this code or build on this work, please cite:
 
 ```bibtex
-@article{kumar2026vlmjudgeuncertainty,
-  title  = {VLM Judges Can Rank but Cannot Score: Task-Dependent
-            Uncertainty in Multimodal Evaluation},
-  author = {Kumar, Divake and Tayebati, Sina and Naik, Devashri and
-            Krishnan, Ranganath and Trivedi, Amit Ranjan},
-  year   = {2026},
+@misc{kumar2026vlmjudgesrankscore,
+      title={VLM Judges Can Rank but Cannot Score: Task-Dependent Uncertainty in Multimodal Evaluation},
+      author={Divake Kumar and Sina Tayebati and Devashri Naik and Ranganath Krishnan and Amit Ranjan Trivedi},
+      year={2026},
+      eprint={2604.25235},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2604.25235},
 }
 ```
 
