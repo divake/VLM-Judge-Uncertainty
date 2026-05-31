@@ -2,6 +2,9 @@
 # README.md is allowlisted below so it is published.
 *.md
 !README.md
+# Reviewer feedback and rebuttal notes are tracked
+!paper/colm2026/reviews/*.md
+!results/rebuttal/*.md
 
 # Large model weights
 /models/
@@ -83,3 +86,7 @@ __pycache__/
 *.safetensors
 *.ckpt
 *.pt
+
+# arXiv submission archives (regenerable from arxiv_submission/ sources)
+/VLM-Judge-Uncertainty_arxiv*.tar.gz
+/VLM-Judge-Uncertainty_arxiv*.zip
