@@ -353,6 +353,12 @@ VLM-Judge-Uncertainty/
 │   ├── v2_mondrian/                  · Mondrian CP results
 │   └── v2_multijudge/                · feature fusion ablation
 │
+├── paper/                          ← paper sources (LaTeX)
+│   └── colm2026/
+│       ├── main_arxiv.tex            · arXiv version source
+│       ├── references_write_01.bib   · bibliography
+│       └── figures/
+│
 └── assets/                         ← README figures (PNG)
 ```
 

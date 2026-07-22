@@ -2,7 +2,8 @@
 # README.md is allowlisted below so it is published.
 *.md
 !README.md
-# Rebuttal notes are tracked
+# Reviewer feedback and rebuttal notes are tracked
+!paper/colm2026/reviews/*.md
 !results/rebuttal/*.md
 
 # Large model weights
@@ -28,6 +29,9 @@
 *.fdb_latexmk
 *.fls
 
+# Built paper PDF — readers should go to arXiv
+paper/colm2026/main_arxiv.pdf
+
 # Per-chunk and per-sample intermediate result CSVs (regenerate from inference)
 results/**/features_s2_p*.csv
 results/**/*_responses.csv
@@ -41,6 +45,12 @@ results/**/test_*.csv
 
 # Reference papers / PDFs at root
 /Analyzing_Uncertainty_of_LLM-as-a-Judge_*.pdf
+
+# CoLM template directory (only the colm2026 paper dir is published)
+paper/colm2026_template/
+
+# Embedded git backup from the CoLM template clone
+paper/colm2026/.git.bak/
 
 # Intermediate feature CSVs
 /model_logits/
@@ -76,3 +86,7 @@ __pycache__/
 *.safetensors
 *.ckpt
 *.pt
+
+# arXiv submission archives (regenerable from arxiv_submission/ sources)
+/VLM-Judge-Uncertainty_arxiv*.tar.gz
+/VLM-Judge-Uncertainty_arxiv*.zip

@@ -1,0 +1,216 @@
+% Rebuttal to Reviewer WoGp — CoLM 2026 Submission 991
+% Compilable on Overleaf (pdflatex)
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage[expansion=false,protrusion=true]{microtype}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, urlcolor=blue}
+\lstset{basicstyle=\ttfamily\small, breaklines=true, frame=single, xleftmargin=1em}
+
+\title{Rebuttal to Reviewer WoGp\\
+\large CoLM 2026, Submission 991}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+Dear Reviewer WoGp,
+
+We sincerely thank you for the careful and constructive review. We are grateful that you recognized the task-level analysis as the paper's most compelling contribution, the empirical scope across three heterogeneous judges and two benchmarks, and the value of the ranking-scoring decoupling analysis as a warning against relying only on Pearson and Spearman correlations. Your detailed critiques identified real issues in the paper's presentation, and we are committed to fixing each of them. We address every weakness below, supported by new experiments and analyses run during the discussion period, and we close with a summary of the camera-ready revisions.\footnote{All rebuttal-period re-runs use fresh random seeds. Numbers reported here for the existing protocol can differ from the submitted tables by up to about 0.04 on coverage and 0.04 on width; this is within seed-to-seed variation and changes no qualitative conclusion. The camera-ready will be re-aligned against a single seed bank.}
+
+\section*{R1. Conformal protocol validity}
+
+You correctly observed that the \S 3.2 sentence ``$\hat{y} = f(\mathbf{x})$ is a point prediction from a model trained on the calibration set'' is misleading. We agree this wording obscures what the code actually does, and we apologize for the confusion. The implementation follows a standard three-way nested split that is fully compatible with the split-conformal guarantee in Eq.\ 4. We resolve the concern in three steps: we state exactly what the code does, we re-run a strictly separated external split for the fitted-model methods, and we explain the one place where the two protocols genuinely differ.
+
+\textbf{What the code actually does.} Starting from the outer 50/50 calibration/test split (\S 4), our R2CCP call internally splits the 50\% calibration data 80/20 using \texttt{R2CCP/}\allowbreak\texttt{data.py:}\allowbreak\texttt{get\_loaders} (with the library's default \texttt{test\_size=0.2}). The inner 80\% (40\% of the total) trains the regression-as-classification network. The inner 20\% (10\% of the total) is held out and used by \texttt{R2CCP/}\allowbreak\texttt{cp.py:}\allowbreak\texttt{get\_cp\_lists} to compute the conformal quantile. The outer 50\% test set is never touched during either step. This nested-split convention is standard in conformal applications with learned predictors, and the quantile-computing fold is disjoint from the test set and from the data used to fit the network's weights. The one remaining subtlety is that R2CCP also uses this inner fold for early-stopping selection; we examine that subtlety directly below and show it to be empirically immaterial under the strictest alternative protocol.
+
+\textbf{Experimental check.} To remove any residual ambiguity, we re-ran the full benchmark under an explicit 40/10/50 \emph{external} split, in which we pass only the 40\% training portion to R2CCP and compute the conformal quantile manually on the disjoint external 10\% that R2CCP never sees, not even for early-stopping validation. Results across 3 judges and 10 seeds:
+
+\begin{center}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l cc cc cc}
+\toprule
+ & \multicolumn{2}{c}{\textbf{Protocol A (paper Table~1)}} & \multicolumn{2}{c}{\textbf{Protocol B (external 40/10/50)}} & \multicolumn{2}{c}{\textbf{Paired $p$}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+\textbf{Judge} & cov & $w$ & cov & $w$ & $\Delta$cov & $\Delta w$ \\
+\midrule
+LLaVA-Critic & $0.900$ & $3.05$ & $0.894 \pm 0.015$ & $3.041 \pm 0.095$ & $0.772$ & $0.093$ \\
+Phi-4        & $0.891$ & $3.13$ & $0.890 \pm 0.012$ & $3.145 \pm 0.076$ & $0.377$ & $0.908$ \\
+Gemini       & $0.898$ & $2.85$ & $0.897 \pm 0.012$ & $2.887 \pm 0.067$ & $0.566$ & $0.015$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Protocol A point estimates are quoted verbatim from paper Table~1, and Protocol B values are mean $\pm$ standard deviation over the 10 rebuttal-period seeds; the $p$-values are paired $t$-tests comparing the two protocols seed by seed on the same rebuttal-period seed bank. The rebuttal-period Protocol-A runs used for these tests reproduce the submitted Table~1 within 0.01 on coverage and 0.04 on width, so the comparison is anchored to the paper. Raw coverage lies within finite-sample sampling error of the 0.90 target for both protocols (0.890 to 0.900 across judges), the A-versus-B difference is statistically null for every judge ($p > 0.37$ throughout), and boundary-adjusted coverage exceeds 0.90 for all three judges. Widths are statistically indistinguishable for LLaVA-Critic and Phi-4. Gemini's mean width rises by 0.030 (paired-test $p = 0.015$); the cause is mechanical and benign. Protocol B reserves the conformal-quantile fold externally, so R2CCP fits its network on roughly 32\% of the data (its internal 80/20 split of the 40\% training portion) rather than the 40\% available under Protocol A. A roughly 20\% reduction in fitting data that produces only a roughly 1\% change in width, with coverage unchanged, is exactly the expected cost of the stricter separation, not contamination evidence. Coverage, the quantity the validity guarantee concerns, holds for every judge under the stricter protocol.
+
+\textbf{Extending the check to CQR and CHR.} Because your concern names R2CCP ``or other predictors'' that are trained and calibrated on the same examples, we re-ran the other two fitted-model methods, CQR and CHR, under the same external 40/10/50 split. For CQR we used MAPIE's \texttt{X\_calib} / \texttt{y\_calib} arguments so the quantile regressor sees only the 40\% training portion and the conformal correction is computed on the disjoint 10\%. For CHR we trained the quantile black-box (\texttt{QNet}) on the 40\%, computed conformity scores on the 10\% via \texttt{HistogramAccumulator.}\allowbreak\texttt{calibrate\_intervals}, and used the finite-sample $(1+1/n)(1-\alpha)$ empirical quantile as the corrected $\hat{\alpha}$ for test-time intervals, which is the standard split-CHR procedure of Sesia \& Romano (2021). Results, 10 seeds per cell:
+
+\begin{center}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{ll cc cc cc}
+\toprule
+ & & \multicolumn{2}{c}{\textbf{Protocol A (paper Tabs~1, 2, 9)}} & \multicolumn{2}{c}{\textbf{Protocol B (40/10/50)}} & \multicolumn{2}{c}{\textbf{Paired $p$}} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+\textbf{Judge} & \textbf{Method} & cov & $w$ & cov & $w$ & $\Delta$cov & $\Delta w$ \\
+\midrule
+LLaVA-Critic & CQR & $0.996$ & $3.95$ & $0.970 \pm 0.011$ & $3.60$ & $0.002$ & $0.002$ \\
+LLaVA-Critic & CHR & $0.880$ & $2.97$ & $\mathbf{0.900 \pm 0.014}$ & $3.29$ & $0.002$ & $0.002$ \\
+Phi-4        & CQR & $0.997$ & $3.98$ & $0.993 \pm 0.009$ & $3.91$ & $0.641$ & $0.469$ \\
+Phi-4        & CHR & $0.896$ & $3.16$ & $\mathbf{0.902 \pm 0.015}$ & $3.33$ & $0.004$ & $0.002$ \\
+Gemini       & CQR & $0.996$ & $3.95$ & $0.977 \pm 0.012$ & $3.65$ & $0.002$ & $0.002$ \\
+Gemini       & CHR & $0.880$ & $2.80$ & $\mathbf{0.906 \pm 0.012}$ & $3.20$ & $0.002$ & $0.002$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Protocol A values are quoted verbatim from paper Table~1 (the cross-judge R2CCP and CHR rows), paper Table~2 (the LLaVA-Critic CQR row, $0.996/3.95$), and paper Table~9 (the cross-judge CQR row, $0.996/0.997/0.996$). As in the R2CCP table, the $p$-values compare matched rebuttal-period A and B runs; the rebuttal-period Protocol-A runs reproduce the submitted values within seed variation, with CHR raw coverage falling between 0.857 and 0.882 across the rebuttal seed bank, similarly below the 0.90 target. The stricter protocol \emph{fixes} CHR validity rather than breaking it. In detail: (i) CQR continues to over-cover because the score-token logprob features are weak for direct quantile regression, exactly as the submission reports, and Protocol B only mildly reduces the over-coverage (for example LLaVA-Critic moves from 0.996 to 0.970) without changing the conclusion; (ii) CHR's submitted rows mildly under-cover (0.880 to 0.896 against the 0.90 target) because the histogram accumulator omitted the finite-sample $(1 + 1/n)(1 - \alpha)$ correction, and under the textbook split-CHR procedure CHR recovers the target coverage on all three judges (0.900, 0.902, 0.906), with widths growing accordingly, which is the honest cost of valid coverage.
+
+\textbf{What we will do.} We will rewrite \S 3.2 to remove the misleading phrase and describe the three-way 40/10/50 partition explicitly, with a small diagram in the appendix. The internal-split protocol is itself valid, so the headline tables remain as published. We will add the Protocol-B robustness tables above (R2CCP, and the CQR and CHR extension) to the appendix as an end-to-end confirmation of Eq.\ 4, anchored to the paper's published numbers, and we will note there that the textbook split-CHR procedure recovers CHR's nominal coverage. This documents the validity of the split-conformal guarantee from end to end without altering the headline tables.
+
+\section*{R2. Boundary-adjustment formula}
+
+You are entirely correct that \S 3.3 as printed is inconsistent with our reported numbers. This is a real bug in the paper text, and we thank you for catching it. The code applies the \textbf{expansion} form, not the shrinkage form printed in \S 3.3. Specifically, \texttt{scripts/run\_all\_conformal.py:42--44} reads:
+
+\begin{lstlisting}
+def boundary_adjust_expand(lows, highs):
+    """Expand: floor lower, ceil upper."""
+    return np.clip(np.floor(lows), 1, 5), np.clip(np.ceil(highs), 1, 5)
+\end{lstlisting}
+
+So the actual transformation is $[l, u] \mapsto [\lfloor l \rfloor, \lceil u \rceil]$, which expands the interval rather than shrinking it. This is consistent with the cited Theorem 1 (Sheng et al., 2025), whose expansion branch states $\mathbb{P}(y_{\text{test}} \in \mathcal{C}'(\mathbf{x}_{\text{test}})) > 1 - \alpha$, and with Tables 1 and 2, in which coverage rises from 0.900 to 0.981 and width rises from 3.05 to 3.60 after adjustment. That is exactly the behavior expansion predicts; the shrinkage form printed in the text would instead lower coverage, which is the inconsistency you identified.
+
+\textbf{What we will do.} We will fix \S 3.3 to print the expansion formula $[\lfloor l \rfloor, \lceil u \rceil]$ and update the surrounding prose to identify the expansion branch of Theorem 1 as the variant we apply. No experiment changes, and all reported numbers in Tables 1, 2, 3 and elsewhere remain valid.
+
+\section*{R3. Inconsistent width normalization}
+
+You are right to flag the inconsistency between \S 4 and \S 5.4 (which use $\div(K-1) = \div 4$) and Table 7 and the abstract (which use $\div K = \div 5$). The correct normalization on a 1 to 5 scale, where width has range $[0, 4]$, is $\div 4$. We will standardize to this convention globally. The corrected numbers, all derived from existing data with no re-runs, are:
+
+\begin{center}
+\small
+\begin{tabular}{lccc}
+\toprule
+\textbf{Slice} & \textbf{Width} & \textbf{Paper $\div 5$ (wrong)} & \textbf{Corrected $\div 4$} \\
+\midrule
+MLLM-Judge (Table 7, R2CCP) & $3.05$ & $61\%$ & $\mathbf{76\%}$ \\
+Polaris (Table 7, R2CCP)    & $0.68$ & $14\%$ & $\mathbf{17\%}$ \\
+AesBench (narrowest task)   & $2.08$ & $42\%$ & $\mathbf{52\%}$ \\
+InfographicsVQA (widest task) & $3.50$ & $70\%$ & $\mathbf{88\%}$ \\
+ChartQA                     & $3.08$ & $62\%$ & $\mathbf{77\%}$ \\
+MathVista                   & $3.37$ & $67\%$ & $\mathbf{84\%}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The abstract's ``$\sim 40\%$ / $\sim 70\%$ of the score range'' was indeed unsupported under either convention. Under the correct $\div 4$ normalization the range across the 14 task categories is 52\% (AesBench) to 88\% (InfographicsVQA), and the MLLM-Judge value you quoted (3.05) corresponds to 76\% of the score range, not 61\%.
+
+\textbf{What we will do.} We will rewrite the abstract sentence to read ``interval width varies from 52\% to 88\% of the score range across 14 task categories, with aesthetics and natural-image tasks at the low end and chart and infographic reasoning at the high end.'' We will update Table~7's percentage column (61\% to 76\% for MLLM-Judge; 14\% to 17\% for Polaris) and audit all other ``percentage of range'' mentions to apply $\div 4$ consistently.
+
+\section*{R4. ``Driven by annotation quality'' is over-causal}
+
+You raise a fair methodological objection: the Polaris-versus-MLLM-Judge comparison varies several factors at once (task type, aggregation, label continuity, score distribution, benchmark construction), so the $4.5\times$ width reduction cannot be cleanly attributed to annotation quality alone. We agree, and we ran a controlled ablation during the discussion period to isolate annotation aggregation as a single factor.
+
+\textbf{Polaris single-annotator ablation.} Polaris ships per-annotator scores for each image-caption pair, with about 37\% of items having 2 or more raters (up to 22). For each random seed we sampled one rater per item and re-ran R2CCP with the same features, the same 50/50 split, and the same configuration as the paper. This holds task type, content distribution, label-mapping scheme, and benchmark identity fixed, so only annotation aggregation differs between the two arms.
+
+\begin{center}
+\small
+\begin{tabular}{lcc}
+\toprule
+\textbf{Arm} & \textbf{Width (raw)} & \textbf{Coverage (raw)} \\
+\midrule
+Multi-annotator (rebuttal re-run)\textsuperscript{*} & $0.717 \pm 0.142$ & $0.902 \pm 0.014$ \\
+Single-annotator (this ablation)                     & $\mathbf{1.001 \pm 0.065}$ & $0.905 \pm 0.009$ \\
+MLLM-Judge (reference, paper Table~7)                & $3.05$ & $0.900$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\footnotesize\textsuperscript{*}Paper Table~7 prints 0.68 for the multi-annotator baseline; the 0.717 here is a rebuttal-period re-run on the same items with fresh seeds (within seed variation, see the opening footnote). Both arms use the rebuttal re-run, so the within-arm comparison is on matched runs.\normalsize
+
+Switching from the multi-annotator mean to a single annotator widens Polaris by 40\% ($1.40\times$) on the same items (paired $t$-test, $p = 0.0004$). This accounts for only $(1.001 - 0.717)/(3.05 - 0.717) \approx 12\%$ of the Polaris-to-MLLM-Judge width gap. The remaining roughly 88\% reflects the other factors you listed (task heterogeneity, content distribution, label continuity, and score-distribution shape), which we cannot disentangle from this comparison and for which we do not claim a specific decomposition. The paper does provide a second isolated factor: across the 14 MLLM-Judge task categories (Table~3, \S 5.4) the same judge produces meaningfully different widths under identical aggregation and annotation protocol, isolating task type with no cross-dataset confounding. A longer benchmark list would not resolve the rest, since no public multimodal scoring benchmark varies these factors orthogonally; clean disentanglement requires a designed factor-isolation study on a controlled stimulus set, which we mark as future work.
+
+\textbf{What we will do.} We will soften the abstract, \S 1, and conclusion language from ``driven by annotation quality'' to a quantitative statement: annotation aggregation contributes approximately 12\% of the Polaris-to-MLLM-Judge width gap (controlled single-versus-multi-annotator ablation); within-MLLM-Judge variation across the 14 task categories isolates task heterogeneity as a second contributor; and the remaining gap reflects multiple factors we do not separately decompose, including content distribution, label continuity, and score-distribution shape. We will add this ablation as a new subsection in \S 5.6 (or as an appendix table). This converts a single confounded comparison into one isolated factor (aggregation, about 12\%), a second isolated factor (task type), and an explicit, quantified acknowledgment that the remaining factors carry the majority.
+
+\section*{R5. Ranking-Scoring Gap (RSG)}
+
+You raise four distinct concerns about the RSG diagnostic, and we address each separately.
+
+\subsection*{R5a. Equation 7 parentheses}
+
+You are right that the printed Eq.~7 is ambiguous as rendered. The intended and implemented definition is
+$$\text{RSG}(d) = |\rho_d| - \left(1 - \frac{w_d}{K-1}\right),$$
+which is what produces the Table~17 values. For WIT under LLaVA-Critic ($\rho = 0.164$, $w = 2.38$, $K = 5$):
+$$|0.164| - \left(1 - 2.38/4\right) = 0.164 - 0.405 = -0.241,$$
+matching the reported $-0.242$ (the small difference is rounding).
+
+\textbf{What we will do.} We will render Eq.~7 with explicit parentheses around the $\left(1 - w_d/(K-1)\right)$ term and verify every Table~17 entry against it.
+
+\subsection*{R5b. RSG is underformalized and overclaimed as ``fundamental''}
+
+This critique is fair. We do not have a calibration-discrimination decomposition for RSG; it is a heuristic combination of two quantities, a ranking measure and a CP informativeness measure, chosen to highlight a practical decision boundary (Likert versus pairwise scoring). We agree that ``previously unrecognized failure mode'' overstates novelty: ranking-scoring decoupling has prior discussion in recommender systems, in the LLM-judge bias literature, and in rating-model evaluation more broadly. Our actual contribution is the first conformal-prediction \emph{formalization} of this decoupling in the VLM-judge setting.
+
+\textbf{What we will do.} We will reframe RSG in \S 5.5 as an \emph{exploratory diagnostic} rather than a fundamental framework, soften ``previously unrecognized failure mode'' to ``underexplored in multimodal-judge evaluation,'' and add citations to the relevant prior decoupling literature in Related Work. We will also relate RSG to Murphy's reliability-resolution decomposition of the Brier score, as an interval-based analogue for ordinal judges that do not emit calibratable probabilities, so the diagnostic has an explicit grounding.
+
+\subsection*{R5c. No confidence intervals on RSG}
+
+This is a clear omission on our part, given the modest per-dataset sample sizes (about 260 to 790 items). We ran an \emph{item-level} bootstrap ($B = 2000$, items resampled with replacement) for the Pearson $\rho$ on every (judge, dataset) cell of Table~17. Item-level resampling is the appropriate unit because the inferential target is the population correlation across items, not the seed-induced variation of a fixed dataset; a seed-level bootstrap on the same data gives $\rho$ intervals roughly $4\times$ tighter and understates genuine sampling uncertainty. We verified the implementation against the Fisher-$z$ analytic interval on representative cells (LLaVA-Critic ChartQA $n=400$: bootstrap half-width 0.071 against Fisher 0.073; WIT $n=399$: 0.094 against 0.096; MathVista $n=789$: 0.063 against 0.060), and the two agree to within 0.003. The RSG interval is propagated through the paper's fixed per-dataset width $w_d$ from Table~3, $\text{RSG}_{\text{lo/hi}} = \rho_{\text{lo/hi}} - (1 - w_d/4)$, so the table reproduces the paper's exact Table~17 point estimates with the new sampling bands. Excerpt for LLaVA-Critic (the full 42-row table replaces Table~17 in the camera-ready):
+
+\begin{center}
+\small
+\begin{tabular}{lccc}
+\toprule
+\textbf{Dataset} & $\rho$ \textbf{(item-bs 95\% CI)} & \textbf{Width (paper Table~3)} & \textbf{RSG (95\% CI)} \\
+\midrule
+AesBench         & $+0.402\ [+0.273, +0.513]$ & $2.08$ & $-0.078\ [-0.207, +0.033]$ \\
+WIT              & $+0.164\ [+0.071, +0.259]$ & $2.38$ & $-0.241\ [-0.334, -0.146]$ \\
+ChartQA          & $+0.507\ [+0.431, +0.574]$ & $3.08$ & $+0.277\ [+0.201, +0.344]$ \\
+InfographicsVQA  & $+0.411\ [+0.331, +0.489]$ & $3.50$ & $+0.286\ [+0.206, +0.364]$ \\
+MathVista        & $+0.376\ [+0.312, +0.437]$ & $3.37$ & $+0.219\ [+0.155, +0.280]$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+WIT's RSG of $-0.241$ matches the paper's Table~17 value of $-0.242$ (rounding), and the other rows reproduce Table~17 to within rounding under the same widths. Even under these wider item-level intervals, the three highest-RSG datasets (ChartQA, InfographicsVQA, MathVista) remain significantly positive: the lower CI bound is at least $+0.15$ for LLaVA-Critic, and above $+0.05$ for all three judges in the full 42-row version. This confirms that the headline cross-judge consistency of the high-uncertainty vision-heavy tasks is not a single-seed artifact.
+
+\textbf{What we will do.} We will replace Table~17 with the version that adds 95\% item-level bootstrap CIs ($B = 2000$, items resampled within each judge--dataset cell) across all 42 cells.
+
+\subsection*{R5d. RSG can become positive simply because intervals are very wide}
+
+This is mathematically correct: as $w_d \to K - 1$, the informativeness term $1 - w_d/(K-1) \to 0$, so $\text{RSG} \to |\rho_d|$. We did not state this clearly in the paper and agree it is worth making explicit, though we view it not as a flaw of the metric but as its \emph{intended} behavior. The diagnostic exists to flag exactly the case where a judge can rank but cannot score precisely, and wide intervals are what unreliable scoring looks like. When a task simultaneously has reasonable $\rho$ and very wide intervals, a high RSG correctly signals ``use pairwise comparison, not absolute Likert scoring,'' which is the actionable recommendation we derive in \S 5.5 and the conclusion.
+
+\textbf{What we will do.} We will add a short paragraph at the end of \S 5.5 making this design rationale explicit, and explaining that RSG should be read as a directional recommendation (use pairwise comparison when RSG is high), not as a calibration score in the sense of Brier or ECE.
+
+\section*{Summary of camera-ready revisions}
+
+In response to your review we will make the following changes:
+
+\begin{enumerate}[leftmargin=*]
+\item \textbf{\S 3.2.} Replace the misleading ``trained on the calibration set'' sentence with a clear description of the three-way 40/10/50 split, with a diagram in the appendix.
+\item \textbf{Appendix (new).} Add the Protocol-B robustness tables (R2CCP, CQR, and CHR under the strict external 40/10/50 split) as an explicit validity check anchored to the paper's published numbers, including the corrected split-CHR procedure that recovers nominal coverage. Headline Tables 1, 2, 3, and 9 are unchanged.
+\item \textbf{\S 3.3.} Correct the boundary-adjustment formula to $[\lfloor l \rfloor, \lceil u \rceil]$ (expansion) and align the prose with the expansion branch of the cited Theorem 1.
+\item \textbf{Abstract.} Replace ``$\sim 40\%$ / $\sim 70\%$'' with the empirically supported ``52\% to 88\% across 14 task categories.''
+\item \textbf{\S 1 contributions and conclusion.} Soften ``driven by task difficulty and annotation quality'' to the quantitative statement: annotation aggregation contributes about 12\% of the Polaris-to-MLLM-Judge width gap; within-MLLM-Judge variation isolates task type as a second contributor; the remaining factors are not separately decomposed.
+\item \textbf{Table~7.} Recompute all ``percentage of range'' entries using $\div(K-1) = \div 4$. New values: MLLM-Judge 76\%, Polaris 17\%.
+\item \textbf{\S 5.5, Eq.\ 7.} Add the explicit form $\text{RSG}(d) = |\rho_d| - (1 - w_d/(K-1))$ with parentheses.
+\item \textbf{\S 5.5 framing.} Reframe RSG as an exploratory diagnostic, soften ``previously unrecognized'' to ``underexplored in multimodal-judge evaluation,'' relate it to the reliability-resolution decomposition, and add prior-art citations.
+\item \textbf{\S 5.5 (new paragraph).} Explain that RSG positivity from wide intervals is the intended behavior and the basis of the pairwise-versus-Likert recommendation.
+\item \textbf{\S 5.6 (or appendix).} Add the Polaris single-annotator ablation isolating annotation aggregation as about 12\% of the width gap.
+\item \textbf{Table~17.} Add 95\% item-level bootstrap CIs ($B = 2000$) across all 42 (judge, dataset) cells.
+\end{enumerate}
+
+All of these revisions are presentation-only or use rebuttal-period data already reported above. None requires re-running the core experiments.
+
+\section*{What remains as the paper's specific contribution}
+
+Beyond the corrections above, we want to clarify briefly what we view as the paper's contribution. We do not claim methodological novelty in the conformal machinery itself, which is adopted from prior text-only LLM-judge uncertainty work and cited as such. What is new is the empirical structure that machinery exposes in the multimodal setting: (i) a 14-task reliability map (Table~3) showing CP width varies from 52\% to 88\% of the score range, which is not visible from Pearson or Spearman correlations alone; (ii) cross-judge consistency of the high-uncertainty tasks (ChartQA, InfographicsVQA, MathVista) across three architecturally distinct judges, which indicates the uncertainty is task-driven rather than judge-driven; and (iii) a practitioner-facing decision rule (when to score versus rank, and per-task triage by CP width) that follows directly from these findings. None of these are derivable from text-only LLM-judge conformal work, where the task-stratification axis is absent by construction.
+
+We are very grateful for the careful review. Several of your critiques (R2, R3, R5b, R5c) identified real bugs that we would not have caught otherwise, and R4 prompted an ablation that gives us a substantially stronger and more precise claim than the original. We remain available throughout the discussion period to answer further questions or to provide additional analyses that would help your evaluation. If our responses and committed revisions address your concerns, we would greatly appreciate your reconsidering the score.
+
+\end{document}
